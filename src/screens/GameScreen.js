@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,27 +6,35 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
+  TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { useGameLogic } from '../hooks/useGameLogic';
 import ClickButton from '../components/ClickButton';
 import Generator from '../components/Generator';
+import UpgradesScreen from './UpgradesScreen';
 import GameIcon from '../components/icons/GameIcon';
 import { COLORS, SPACING } from '../constants/gameConstants';
 import { formatCurrency, formatPerSecond } from '../utils/gameUtils';
 
 /**
- * 🎮 GameScreen - Main game interface with custom icons
+ * 🎮 GameScreen - Main game interface with upgrades integration
  * Simple, focused layout with all essential elements
  */
 const GameScreen = () => {
+  const [showUpgrades, setShowUpgrades] = useState(false);
+  
   const {
     currency,
     totalIncome,
     clickPower,
     prestigeMultiplier,
     generators,
+    clickUpgrades,
     handleClick,
     buyGenerator,
+    buyClickUpgrade,
+    getTotalClickMultiplier,
     isLoaded,
   } = useGameLogic();
 
@@ -40,6 +48,13 @@ const GameScreen = () => {
     );
   }
 
+  const handleBuyClickUpgrade = (upgradeId) => {
+    const upgrade = clickUpgrades.find(u => u.id === upgradeId);
+    if (upgrade && currency >= upgrade.cost) {
+      buyClickUpgrade(upgradeId);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
@@ -51,6 +66,17 @@ const GameScreen = () => {
           <Text style={styles.title}>Idle Empire</Text>
         </View>
         
+        <TouchableOpacity 
+          style={styles.upgradesButton}
+          onPress={() => setShowUpgrades(true)}
+        >
+          <GameIcon type="upgrade" size={20} color={COLORS.background} />
+          <Text style={styles.upgradesButtonText}>Upgrades</Text>
+        </TouchableOpacity>
+      </View>
+      
+      {/* Currency Display */}
+      <View style={styles.currencySection}>
         <View style={styles.currencyContainer}>
           <GameIcon type="currency" size={28} color={COLORS.currencyGold} />
           <Text style={styles.currency}>{formatCurrency(currency)}</Text>
@@ -81,6 +107,12 @@ const GameScreen = () => {
           onPress={handleClick}
           clickValue={clickPower * prestigeMultiplier}
         />
+        
+        {getTotalClickMultiplier() > 1 && (
+          <Text style={styles.clickMultiplier}>
+            Multiplicateur de clic: {getTotalClickMultiplier().toFixed(2)}x
+          </Text>
+        )}
       </View>
 
       {/* Generators section */}
@@ -104,6 +136,21 @@ const GameScreen = () => {
           ))}
         </ScrollView>
       </View>
+
+      {/* Upgrades Modal */}
+      <Modal
+        visible={showUpgrades}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <UpgradesScreen
+          currency={currency}
+          clickUpgrades={clickUpgrades}
+          onBuyClickUpgrade={handleBuyClickUpgrade}
+          getTotalClickMultiplier={getTotalClickMultiplier}
+          onClose={() => setShowUpgrades(false)}
+        />
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -124,8 +171,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: SPACING.lg,
+    justifyContent: 'space-between',
+    paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.surface,
@@ -133,13 +182,31 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: COLORS.text,
     marginLeft: SPACING.sm,
+  },
+  upgradesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 20,
+  },
+  upgradesButtonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.background,
+    marginLeft: SPACING.xs,
+  },
+  currencySection: {
+    alignItems: 'center',
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
   },
   currencyContainer: {
     flexDirection: 'row',
@@ -175,7 +242,13 @@ const styles = StyleSheet.create({
   },
   clickSection: {
     alignItems: 'center',
-    paddingVertical: SPACING.xl,
+    paddingVertical: SPACING.lg,
+  },
+  clickMultiplier: {
+    fontSize: 14,
+    color: COLORS.accent,
+    fontWeight: '600',
+    marginTop: SPACING.sm,
   },
   generatorsSection: {
     flex: 1,

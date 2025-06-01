@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { Pressable, Text, StyleSheet, View } from 'react-native';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -7,13 +7,14 @@ import Animated, {
   withSequence,
   runOnJS
 } from 'react-native-reanimated';
-import { COLORS, SPACING, SCREEN } from '../constants/gameConstants';
+import GameIcon from './icons/GameIcon';
+import { COLORS, SPACING } from '../constants/gameConstants';
 import { formatCurrency } from '../utils/gameUtils';
 
 /**
  * 🎯 ClickButton Component
  * The main interactive element that players tap to earn currency
- * Includes satisfying animations and haptic feedback
+ * Includes satisfying animations and haptic feedback with custom icons
  */
 const ClickButton = ({ 
   onPress, 
@@ -58,7 +59,13 @@ const ClickButton = ({
   return (
     <Pressable onPress={handlePress} disabled={disabled}>
       <Animated.View style={[styles.container, animatedStyle, style]}>
-        <Text style={styles.emoji}>💰</Text>
+        <View style={styles.iconContainer}>
+          <GameIcon 
+            type="click" 
+            size={48} 
+            color={COLORS.background}
+          />
+        </View>
         <Text style={styles.value}>{formatCurrency(clickValue)}</Text>
         <Text style={styles.label}>TAP TO EARN</Text>
       </Animated.View>
@@ -68,9 +75,9 @@ const ClickButton = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: SCREEN.CLICK_BUTTON_SIZE,
-    height: SCREEN.CLICK_BUTTON_SIZE,
-    borderRadius: SCREEN.CLICK_BUTTON_SIZE / 2,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -85,8 +92,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: COLORS.accent,
   },
-  emoji: {
-    fontSize: 32,
+  iconContainer: {
     marginBottom: SPACING.xs,
   },
   value: {

@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { COLORS, SPACING, SCREEN, BORDER_RADIUS } from '../constants/gameConstants';
-import { formatNumber, formatPerSecond } from '../utils/gameUtils';
+import GameIcon from './icons/GameIcon';
+import { COLORS, SPACING } from '../constants/gameConstants';
+import { formatCurrency, formatPerSecond } from '../utils/gameUtils';
 
 /**
  * 🏭 Generator Component
- * Displays a single generator with purchase option
+ * Displays a single generator with purchase option using custom icons
  * Simple, focused, and reusable
  */
 const Generator = ({ 
@@ -14,11 +15,9 @@ const Generator = ({
   canAfford = false,
   disabled = false 
 }) => {
-  const { id, name, icon, description, cost, owned, income } = generator;
-
   const handlePress = () => {
     if (canAfford && !disabled) {
-      onBuy(id);
+      onBuy(generator.id);
     }
   };
 
@@ -34,27 +33,35 @@ const Generator = ({
     >
       {/* Icon */}
       <View style={styles.iconContainer}>
-        <Text style={styles.icon}>{icon}</Text>
+        <GameIcon 
+          type="factory" 
+          size={24} 
+          color={canAfford ? COLORS.background : COLORS.textSecondary}
+        />
       </View>
 
       {/* Info */}
       <View style={styles.infoContainer}>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.description}>{description}</Text>
+        <Text style={styles.name}>{generator.name}</Text>
+        <Text style={styles.description}>Génère des revenus automatiques</Text>
         
-        {owned > 0 && (
+        {generator.count > 0 && (
           <Text style={styles.income}>
-            {formatPerSecond(income)} per generator
+            <GameIcon type="income" size={12} color={COLORS.success} style={{ marginRight: 4 }} />
+            {formatPerSecond(generator.baseIncome * generator.count)} par seconde
           </Text>
         )}
       </View>
 
       {/* Stats */}
       <View style={styles.statsContainer}>
-        <Text style={styles.owned}>Owned: {owned}</Text>
-        <Text style={[styles.cost, canAfford ? styles.affordableCost : styles.unaffordableCost]}>
-          💰 {formatNumber(cost)}
-        </Text>
+        <Text style={styles.owned}>Possédé: {generator.count}</Text>
+        <View style={styles.costContainer}>
+          <GameIcon type="currency" size={16} color={canAfford ? COLORS.success : COLORS.warning} />
+          <Text style={[styles.cost, canAfford ? styles.affordableCost : styles.unaffordableCost]}>
+            {formatCurrency(generator.cost)}
+          </Text>
+        </View>
       </View>
     </Pressable>
   );
@@ -62,13 +69,13 @@ const Generator = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: SCREEN.GENERATOR_HEIGHT,
+    height: 80,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     marginVertical: SPACING.xs,
     marginHorizontal: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: 12,
     paddingHorizontal: SPACING.md,
     borderWidth: 2,
     borderColor: 'transparent',
@@ -93,11 +100,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.primary,
-    borderRadius: BORDER_RADIUS.sm,
+    borderRadius: 8,
     marginRight: SPACING.md,
-  },
-  icon: {
-    fontSize: 20,
   },
   infoContainer: {
     flex: 1,
@@ -116,8 +120,10 @@ const styles = StyleSheet.create({
   },
   income: {
     fontSize: 10,
-    color: COLORS.accent,
+    color: COLORS.success,
     fontWeight: '600',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   statsContainer: {
     alignItems: 'flex-end',
@@ -127,15 +133,20 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginBottom: SPACING.xs / 2,
   },
+  costContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   cost: {
     fontSize: 14,
     fontWeight: 'bold',
+    marginLeft: 4,
   },
   affordableCost: {
     color: COLORS.success,
   },
   unaffordableCost: {
-    color: COLORS.error,
+    color: COLORS.warning,
   },
 });
 

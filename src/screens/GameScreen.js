@@ -7,22 +7,21 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  Modal,
 } from 'react-native';
 import { useGameLogic } from '../hooks/useGameLogic';
 import ClickButton from '../components/ClickButton';
 import Generator from '../components/Generator';
-import UpgradesScreen from './UpgradesScreen';
+import ClickUpgrade from '../components/ClickUpgrade';
 import GameIcon from '../components/icons/GameIcon';
 import { COLORS, SPACING } from '../constants/gameConstants';
 import { formatCurrency, formatPerSecond } from '../utils/gameUtils';
 
 /**
- * 🎮 GameScreen - Main game interface with upgrades integration
- * Simple, focused layout with all essential elements
+ * 🎮 GameScreen - Main game interface with tab-based navigation
+ * Generators and Upgrades in separate tabs
  */
 const GameScreen = () => {
-  const [showUpgrades, setShowUpgrades] = useState(false);
+  const [activeTab, setActiveTab] = useState('generators'); // 'generators' or 'upgrades'
   
   const {
     currency,
@@ -65,14 +64,6 @@ const GameScreen = () => {
           <GameIcon type="factory" size={24} color={COLORS.primary} />
           <Text style={styles.title}>Idle Empire</Text>
         </View>
-        
-        <TouchableOpacity 
-          style={styles.upgradesButton}
-          onPress={() => setShowUpgrades(true)}
-        >
-          <GameIcon type="upgrade" size={20} color={COLORS.background} />
-          <Text style={styles.upgradesButtonText}>Upgrades</Text>
-        </TouchableOpacity>
       </View>
       
       {/* Currency Display */}
@@ -115,42 +106,108 @@ const GameScreen = () => {
         )}
       </View>
 
-      {/* Generators section */}
-      <View style={styles.generatorsSection}>
-        <View style={styles.sectionHeader}>
-          <GameIcon type="generator" size={20} color={COLORS.secondary} />
-          <Text style={styles.sectionTitle}>Générateurs</Text>
-        </View>
-        
-        <ScrollView 
-          style={styles.generatorsList}
-          showsVerticalScrollIndicator={false}
+      {/* Tab Navigation */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'generators' && styles.activeTab
+          ]}
+          onPress={() => setActiveTab('generators')}
         >
-          {generators.map((generator) => (
-            <Generator
-              key={generator.id}
-              generator={generator}
-              onBuy={buyGenerator}
-              canAfford={currency >= generator.cost}
-            />
-          ))}
-        </ScrollView>
+          <GameIcon 
+            type="generator" 
+            size={20} 
+            color={activeTab === 'generators' ? COLORS.background : COLORS.textSecondary} 
+          />
+          <Text style={[
+            styles.tabText,
+            activeTab === 'generators' && styles.activeTabText
+          ]}>
+            Générateurs
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'upgrades' && styles.activeTab
+          ]}
+          onPress={() => setActiveTab('upgrades')}
+        >
+          <GameIcon 
+            type="upgrade" 
+            size={20} 
+            color={activeTab === 'upgrades' ? COLORS.background : COLORS.textSecondary} 
+          />
+          <Text style={[
+            styles.tabText,
+            activeTab === 'upgrades' && styles.activeTabText
+          ]}>
+            Améliorations
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Upgrades Modal */}
-      <Modal
-        visible={showUpgrades}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        <UpgradesScreen
-          currency={currency}
-          clickUpgrades={clickUpgrades}
-          onBuyClickUpgrade={handleBuyClickUpgrade}
-          getTotalClickMultiplier={getTotalClickMultiplier}
-          onClose={() => setShowUpgrades(false)}
-        />
-      </Modal>
+      {/* Content Section */}
+      <View style={styles.contentSection}>
+        {activeTab === 'generators' ? (
+          // Generators Tab
+          <ScrollView 
+            style={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+          >
+            {generators.map((generator) => (
+              <Generator
+                key={generator.id}
+                generator={generator}
+                onBuy={buyGenerator}
+                canAfford={currency >= generator.cost}
+              />
+            ))}
+          </ScrollView>
+        ) : (
+          // Upgrades Tab
+          <ScrollView 
+            style={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Multiplicateur info */}
+            <View style={styles.multiplierInfo}>
+              <Text style={styles.multiplierText}>
+                Multiplicateur total: <Text style={styles.multiplierValue}>
+                  {getTotalClickMultiplier().toFixed(2)}x
+                </Text>
+              </Text>
+            </View>
+
+            {clickUpgrades && clickUpgrades.length > 0 ? (
+              clickUpgrades.map((upgrade) => (
+                <ClickUpgrade
+                  key={upgrade.id}
+                  upgrade={upgrade}
+                  onBuy={handleBuyClickUpgrade}
+                  canAfford={currency >= upgrade.cost}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>Aucun améliorateur disponible</Text>
+              </View>
+            )}
+
+            {/* Conseils */}
+            <View style={styles.tipsSection}>
+              <Text style={styles.tipsTitle}>💡 Conseils</Text>
+              <Text style={styles.tipText}>
+                • Les améliorations augmentent de façon exponentielle{'\n'}
+                • Équilibrez entre clics et générateurs{'\n'}
+                • Les premiers niveaux sont les plus rentables
+              </Text>
+            </View>
+          </ScrollView>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -173,7 +230,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.md,
     borderBottomWidth: 1,
@@ -189,20 +246,6 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     marginLeft: SPACING.sm,
   },
-  upgradesButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: 20,
-  },
-  upgradesButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: COLORS.background,
-    marginLeft: SPACING.xs,
-  },
   currencySection: {
     alignItems: 'center',
     paddingVertical: SPACING.md,
@@ -214,7 +257,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   currency: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: COLORS.primary,
     marginLeft: SPACING.sm,
@@ -225,7 +268,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   income: {
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.success,
     fontWeight: '600',
     marginLeft: SPACING.sm,
@@ -235,7 +278,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   prestige: {
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.accent,
     fontWeight: '600',
     marginLeft: SPACING.sm,
@@ -245,29 +288,91 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.lg,
   },
   clickMultiplier: {
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.accent,
     fontWeight: '600',
     marginTop: SPACING.sm,
   },
-  generatorsSection: {
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.md,
+    borderRadius: 8,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: 6,
+  },
+  activeTab: {
+    backgroundColor: COLORS.primary,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+    marginLeft: SPACING.xs,
+  },
+  activeTabText: {
+    color: COLORS.background,
+  },
+  contentSection: {
     flex: 1,
     paddingTop: SPACING.md,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.md,
-    marginHorizontal: SPACING.md,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginLeft: SPACING.sm,
-  },
-  generatorsList: {
+  scrollView: {
     flex: 1,
+  },
+  multiplierInfo: {
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.md,
+    marginBottom: SPACING.md,
+    padding: SPACING.md,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.primary,
+  },
+  multiplierText: {
+    fontSize: 16,
+    color: COLORS.text,
+    fontWeight: '600',
+  },
+  multiplierValue: {
+    color: COLORS.primary,
+    fontWeight: 'bold',
+  },
+  emptyState: {
+    padding: SPACING.lg,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  tipsSection: {
+    backgroundColor: COLORS.surface,
+    margin: SPACING.md,
+    padding: SPACING.md,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.accent,
+  },
+  tipsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.accent,
+    marginBottom: SPACING.sm,
+  },
+  tipText: {
+    fontSize: 14,
+    color: COLORS.text,
+    lineHeight: 20,
   },
 });
 

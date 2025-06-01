@@ -10,12 +10,18 @@
       "backgroundColor": "#1a1a1a"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "newArchEnabled": false
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#1a1a1a"
-      }
+      },
+      "newArchEnabled": false
+    },
+    "newArchEnabled": false,
+    "experiments": {
+      "typedRoutes": false
     }
   }
 }

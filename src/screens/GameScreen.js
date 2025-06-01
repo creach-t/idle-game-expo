@@ -10,11 +10,12 @@ import {
 import { useGameLogic } from '../hooks/useGameLogic';
 import ClickButton from '../components/ClickButton';
 import Generator from '../components/Generator';
+import GameIcon from '../components/icons/GameIcon';
 import { COLORS, SPACING } from '../constants/gameConstants';
 import { formatCurrency, formatPerSecond } from '../utils/gameUtils';
 
 /**
- * 🎮 GameScreen - Main game interface
+ * 🎮 GameScreen - Main game interface with custom icons
  * Simple, focused layout with all essential elements
  */
 const GameScreen = () => {
@@ -45,19 +46,32 @@ const GameScreen = () => {
       
       {/* Header with currency display */}
       <View style={styles.header}>
-        <Text style={styles.title}>💰 Idle Empire</Text>
-        <Text style={styles.currency}>{formatCurrency(currency)}</Text>
+        <View style={styles.titleContainer}>
+          <GameIcon type="factory" size={24} color={COLORS.primary} />
+          <Text style={styles.title}>Idle Empire</Text>
+        </View>
+        
+        <View style={styles.currencyContainer}>
+          <GameIcon type="currency" size={28} color={COLORS.currencyGold} />
+          <Text style={styles.currency}>{formatCurrency(currency)}</Text>
+        </View>
         
         {totalIncome > 0 && (
-          <Text style={styles.income}>
-            📈 {formatPerSecond(totalIncome)}
-          </Text>
+          <View style={styles.incomeContainer}>
+            <GameIcon type="income" size={16} color={COLORS.success} />
+            <Text style={styles.income}>
+              {formatPerSecond(totalIncome)}
+            </Text>
+          </View>
         )}
         
         {prestigeMultiplier > 1 && (
-          <Text style={styles.prestige}>
-            ⭐ {prestigeMultiplier.toFixed(1)}x Prestige Bonus
-          </Text>
+          <View style={styles.prestigeContainer}>
+            <GameIcon type="prestige" size={16} color={COLORS.accent} />
+            <Text style={styles.prestige}>
+              {prestigeMultiplier.toFixed(1)}x Prestige Bonus
+            </Text>
+          </View>
         )}
       </View>
 
@@ -71,7 +85,10 @@ const GameScreen = () => {
 
       {/* Generators section */}
       <View style={styles.generatorsSection}>
-        <Text style={styles.sectionTitle}>🏭 Generators</Text>
+        <View style={styles.sectionHeader}>
+          <GameIcon type="generator" size={20} color={COLORS.secondary} />
+          <Text style={styles.sectionTitle}>Générateurs</Text>
+        </View>
         
         <ScrollView 
           style={styles.generatorsList}
@@ -113,28 +130,48 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.surface,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: COLORS.text,
-    marginBottom: SPACING.sm,
+    marginLeft: SPACING.sm,
+  },
+  currencyContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
   },
   currency: {
     fontSize: 32,
     fontWeight: 'bold',
     color: COLORS.primary,
+    marginLeft: SPACING.sm,
+  },
+  incomeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: SPACING.xs,
   },
   income: {
     fontSize: 16,
     color: COLORS.success,
     fontWeight: '600',
-    marginBottom: SPACING.xs,
+    marginLeft: SPACING.sm,
+  },
+  prestigeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   prestige: {
     fontSize: 14,
     color: COLORS.accent,
     fontWeight: '600',
+    marginLeft: SPACING.sm,
   },
   clickSection: {
     alignItems: 'center',
@@ -144,12 +181,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: SPACING.md,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+    marginHorizontal: SPACING.md,
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.text,
-    marginBottom: SPACING.md,
-    marginHorizontal: SPACING.md,
+    marginLeft: SPACING.sm,
   },
   generatorsList: {
     flex: 1,

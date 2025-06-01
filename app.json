@@ -23,10 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1a1a1a"
       },
-      "package": "com.idlegame.expo",
-      "permissions": [
-        "android.permission.SCHEDULE_EXACT_ALARM"
-      ]
+      "package": "com.idlegame.expo"
     },
     "web": {
       "favicon": "./assets/favicon.png"

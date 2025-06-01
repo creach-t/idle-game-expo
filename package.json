@@ -23,6 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "expo": "~53.0.0",
+    "expo-status-bar": "~2.0.0",
     "react": "18.2.0",
     "react-native": "0.76.3",
     "@react-navigation/native": "^6.1.7",

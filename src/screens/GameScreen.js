@@ -5,8 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
-  StatusBar,
   TouchableOpacity,
+  Dimensions,
+  StatusBar,
 } from 'react-native';
 import { useGameLogic } from '../hooks/useGameLogic';
 import ClickButton from '../components/ClickButton';
@@ -16,12 +17,13 @@ import GameIcon from '../components/icons/GameIcon';
 import { COLORS, SPACING } from '../constants/gameConstants';
 import { formatCurrency, formatPerSecond } from '../utils/gameUtils';
 
+const { width, height } = Dimensions.get('window');
+
 /**
- * 🎮 GameScreen - Main game interface with tab-based navigation
- * Generators and Upgrades in separate tabs
+ * 🎮 GameScreen - Beautiful, modern idle game interface
  */
 const GameScreen = () => {
-  const [activeTab, setActiveTab] = useState('generators'); // 'generators' or 'upgrades'
+  const [activeTab, setActiveTab] = useState('generators');
   
   const {
     currency,
@@ -39,11 +41,10 @@ const GameScreen = () => {
 
   if (!isLoaded) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading Idle Empire...</Text>
-        </View>
-      </SafeAreaView>
+      <View style={styles.loadingContainer}>
+        <GameIcon type="factory" size={64} color={COLORS.primary} />
+        <Text style={styles.loadingText}>Chargement d'Idle Empire...</Text>
+      </View>
     );
   }
 
@@ -55,107 +56,96 @@ const GameScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+    <View style={styles.container}>
+      <StatusBar hidden />
       
-      {/* Header with currency display */}
+      {/* Header Section */}
       <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <GameIcon type="factory" size={24} color={COLORS.primary} />
-          <Text style={styles.title}>Idle Empire</Text>
-        </View>
-      </View>
-      
-      {/* Currency Display */}
-      <View style={styles.currencySection}>
-        <View style={styles.currencyContainer}>
-          <GameIcon type="currency" size={28} color={COLORS.currencyGold} />
-          <Text style={styles.currency}>{formatCurrency(currency)}</Text>
+        <View style={styles.titleSection}>
+          <View style={styles.titleContainer}>
+            <GameIcon type="factory" size={32} color={COLORS.primary} />
+            <Text style={styles.title}>Idle Empire</Text>
+          </View>
+          
+          <View style={styles.currencyCard}>
+            <GameIcon type="currency" size={24} color={COLORS.currencyGold} />
+            <Text style={styles.currency}>{formatCurrency(currency)}</Text>
+          </View>
         </View>
         
-        {totalIncome > 0 && (
-          <View style={styles.incomeContainer}>
-            <GameIcon type="income" size={16} color={COLORS.success} />
-            <Text style={styles.income}>
-              {formatPerSecond(totalIncome)}
-            </Text>
-          </View>
-        )}
-        
-        {prestigeMultiplier > 1 && (
-          <View style={styles.prestigeContainer}>
-            <GameIcon type="prestige" size={16} color={COLORS.accent} />
-            <Text style={styles.prestige}>
-              {prestigeMultiplier.toFixed(1)}x Prestige Bonus
-            </Text>
-          </View>
-        )}
+        {/* Stats Row */}
+        <View style={styles.statsRow}>
+          {totalIncome > 0 && (
+            <View style={styles.statCard}>
+              <GameIcon type="income" size={16} color={COLORS.success} />
+              <Text style={styles.statText}>{formatPerSecond(totalIncome)}</Text>
+            </View>
+          )}
+          
+          {getTotalClickMultiplier() > 1 && (
+            <View style={styles.statCard}>
+              <GameIcon type="click" size={16} color={COLORS.accent} />
+              <Text style={styles.statText}>{getTotalClickMultiplier().toFixed(1)}x clic</Text>
+            </View>
+          )}
+          
+          {prestigeMultiplier > 1 && (
+            <View style={styles.statCard}>
+              <GameIcon type="prestige" size={16} color={COLORS.accent} />
+              <Text style={styles.statText}>{prestigeMultiplier.toFixed(1)}x prestige</Text>
+            </View>
+          )}
+        </View>
       </View>
 
-      {/* Click section */}
+      {/* Click Section */}
       <View style={styles.clickSection}>
         <ClickButton 
           onPress={handleClick}
           clickValue={clickPower * prestigeMultiplier}
         />
-        
-        {getTotalClickMultiplier() > 1 && (
-          <Text style={styles.clickMultiplier}>
-            Multiplicateur de clic: {getTotalClickMultiplier().toFixed(2)}x
-          </Text>
-        )}
       </View>
 
       {/* Tab Navigation */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'generators' && styles.activeTab
-          ]}
-          onPress={() => setActiveTab('generators')}
-        >
-          <GameIcon 
-            type="generator" 
-            size={20} 
-            color={activeTab === 'generators' ? COLORS.background : COLORS.textSecondary} 
-          />
-          <Text style={[
-            styles.tabText,
-            activeTab === 'generators' && styles.activeTabText
-          ]}>
-            Générateurs
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.tabWrapper}>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'generators' && styles.activeTab]}
+            onPress={() => setActiveTab('generators')}
+          >
+            <GameIcon 
+              type="generator" 
+              size={20} 
+              color={activeTab === 'generators' ? COLORS.background : COLORS.textSecondary} 
+            />
+            <Text style={[styles.tabText, activeTab === 'generators' && styles.activeTabText]}>
+              Générateurs
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'upgrades' && styles.activeTab
-          ]}
-          onPress={() => setActiveTab('upgrades')}
-        >
-          <GameIcon 
-            type="upgrade" 
-            size={20} 
-            color={activeTab === 'upgrades' ? COLORS.background : COLORS.textSecondary} 
-          />
-          <Text style={[
-            styles.tabText,
-            activeTab === 'upgrades' && styles.activeTabText
-          ]}>
-            Améliorations
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'upgrades' && styles.activeTab]}
+            onPress={() => setActiveTab('upgrades')}
+          >
+            <GameIcon 
+              type="upgrade" 
+              size={20} 
+              color={activeTab === 'upgrades' ? COLORS.background : COLORS.textSecondary} 
+            />
+            <Text style={[styles.tabText, activeTab === 'upgrades' && styles.activeTabText]}>
+              Améliorations
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Content Section */}
       <View style={styles.contentSection}>
         {activeTab === 'generators' ? (
-          // Generators Tab
           <ScrollView 
             style={styles.scrollView}
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
           >
             {generators.map((generator) => (
               <Generator
@@ -167,20 +157,11 @@ const GameScreen = () => {
             ))}
           </ScrollView>
         ) : (
-          // Upgrades Tab
           <ScrollView 
             style={styles.scrollView}
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
           >
-            {/* Multiplicateur info */}
-            <View style={styles.multiplierInfo}>
-              <Text style={styles.multiplierText}>
-                Multiplicateur total: <Text style={styles.multiplierValue}>
-                  {getTotalClickMultiplier().toFixed(2)}x
-                </Text>
-              </Text>
-            </View>
-
             {clickUpgrades && clickUpgrades.length > 0 ? (
               clickUpgrades.map((upgrade) => (
                 <ClickUpgrade
@@ -192,23 +173,15 @@ const GameScreen = () => {
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>Aucun améliorateur disponible</Text>
+                <GameIcon type="upgrade" size={48} color={COLORS.textSecondary} />
+                <Text style={styles.emptyText}>Aucune amélioration disponible</Text>
+                <Text style={styles.emptySubtext}>Continuez à cliquer pour débloquer des améliorations !</Text>
               </View>
             )}
-
-            {/* Conseils */}
-            <View style={styles.tipsSection}>
-              <Text style={styles.tipsTitle}>💡 Conseils</Text>
-              <Text style={styles.tipText}>
-                • Les améliorations augmentent de façon exponentielle{'\n'}
-                • Équilibrez entre clics et générateurs{'\n'}
-                • Les premiers niveaux sont les plus rentables
-              </Text>
-            </View>
           </ScrollView>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -219,6 +192,7 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
+    backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -226,91 +200,101 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: COLORS.text,
     fontWeight: '600',
+    marginTop: SPACING.md,
   },
   header: {
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.md,
+  },
+  titleSection: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.surface,
+    marginBottom: SPACING.md,
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: COLORS.text,
     marginLeft: SPACING.sm,
   },
-  currencySection: {
-    alignItems: 'center',
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-  },
-  currencyContainer: {
+  currencyCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.xs,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
   },
   currency: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.primary,
-    marginLeft: SPACING.sm,
+    marginLeft: SPACING.xs,
   },
-  incomeContainer: {
+  statsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+  },
+  statCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.xs,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  income: {
-    fontSize: 14,
-    color: COLORS.success,
-    fontWeight: '600',
-    marginLeft: SPACING.sm,
-  },
-  prestigeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  prestige: {
+  statText: {
     fontSize: 12,
-    color: COLORS.accent,
+    color: COLORS.text,
     fontWeight: '600',
-    marginLeft: SPACING.sm,
+    marginLeft: SPACING.xs,
   },
   clickSection: {
-    alignItems: 'center',
-    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
   },
-  clickMultiplier: {
-    fontSize: 12,
-    color: COLORS.accent,
-    fontWeight: '600',
-    marginTop: SPACING.sm,
+  tabWrapper: {
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
   },
   tabContainer: {
     flexDirection: 'row',
     backgroundColor: COLORS.surface,
-    marginHorizontal: SPACING.md,
-    borderRadius: 8,
+    borderRadius: 16,
     padding: 4,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   tab: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.md,
-    borderRadius: 6,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.sm,
+    borderRadius: 12,
   },
   activeTab: {
     backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   tabText: {
     fontSize: 14,
@@ -323,56 +307,32 @@ const styles = StyleSheet.create({
   },
   contentSection: {
     flex: 1,
-    paddingTop: SPACING.md,
   },
   scrollView: {
     flex: 1,
   },
-  multiplierInfo: {
-    backgroundColor: COLORS.surface,
-    marginHorizontal: SPACING.md,
-    marginBottom: SPACING.md,
-    padding: SPACING.md,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary,
-  },
-  multiplierText: {
-    fontSize: 16,
-    color: COLORS.text,
-    fontWeight: '600',
-  },
-  multiplierValue: {
-    color: COLORS.primary,
-    fontWeight: 'bold',
+  scrollContent: {
+    paddingBottom: SPACING.xl,
   },
   emptyState: {
-    padding: SPACING.lg,
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.xxl,
+    paddingHorizontal: SPACING.lg,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 18,
     color: COLORS.textSecondary,
+    fontWeight: '600',
     textAlign: 'center',
+    marginTop: SPACING.md,
   },
-  tipsSection: {
-    backgroundColor: COLORS.surface,
-    margin: SPACING.md,
-    padding: SPACING.md,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.accent,
-  },
-  tipsTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.accent,
-    marginBottom: SPACING.sm,
-  },
-  tipText: {
+  emptySubtext: {
     fontSize: 14,
-    color: COLORS.text,
-    lineHeight: 20,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    marginTop: SPACING.xs,
   },
 });
 

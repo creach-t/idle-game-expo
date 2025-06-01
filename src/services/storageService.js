@@ -1,146 +1,85 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
- * 💾 Game Storage Service
- * Handles saving and loading game state with error handling
+ * 💾 storageService - Service de sauvegarde pour le jeu
+ * Gère la persistance des données de jeu avec AsyncStorage
  */
 
-const STORAGE_KEY = '@IdleGame:SaveData';
-const BACKUP_KEY = '@IdleGame:BackupData';
+const STORAGE_KEYS = {
+  GAME_STATE: '@idle_empire_game_state',
+  UPGRADES: '@idle_empire_upgrades',
+  SETTINGS: '@idle_empire_settings',
+  STATISTICS: '@idle_empire_statistics',
+};
 
-/**
- * Save game state to AsyncStorage
- */
-export const saveGame = async (gameState) => {
+// Sauvegarde de l'état du jeu
+export const saveGameState = async (gameState) => {
   try {
-    // Add timestamp to save data
-    const saveData = {
-      ...gameState,
-      lastSaveTime: Date.now(),
-      version: '1.0.0', // For future migration handling
+    const jsonValue = JSON.stringify(gameState);
+    await AsyncStorage.setItem(STORAGE_KEYS.GAME_STATE, jsonValue);
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde de l\'état du jeu:', error);
+    throw error;
+  }
+};
+
+// Chargement de l'état du jeu
+export const loadGameState = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(STORAGE_KEYS.GAME_STATE);
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (error) {
+    console.error('Erreur lors du chargement de l\'état du jeu:', error);
+    return null;
+  }
+};
+
+// Sauvegarde des upgrades
+export const saveUpgrades = async (upgrades) => {
+  try {
+    const jsonValue = JSON.stringify(upgrades);
+    await AsyncStorage.setItem(STORAGE_KEYS.UPGRADES, jsonValue);
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des upgrades:', error);
+    throw error;
+  }
+};
+
+// Chargement des upgrades
+export const loadUpgrades = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(STORAGE_KEYS.UPGRADES);
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (error) {
+    console.error('Erreur lors du chargement des upgrades:', error);
+    return null;
+  }
+};
+
+// Réinitialisation complète des données
+export const clearAllData = async () => {
+  try {
+    await AsyncStorage.multiRemove(Object.values(STORAGE_KEYS));
+  } catch (error) {
+    console.error('Erreur lors de la suppression des données:', error);
+    throw error;
+  }
+};
+
+// Exportation des données pour sauvegarde externe
+export const exportGameData = async () => {
+  try {
+    const gameState = await loadGameState();
+    const upgrades = await loadUpgrades();
+    
+    return {
+      gameState,
+      upgrades,
+      exportDate: new Date().toISOString(),
+      version: '1.0.0',
     };
-
-    const jsonValue = JSON.stringify(saveData);
-    
-    // Save main data
-    await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
-    
-    // Create backup (previous save)
-    const existingData = await AsyncStorage.getItem(STORAGE_KEY);
-    if (existingData) {
-      await AsyncStorage.setItem(BACKUP_KEY, existingData);
-    }
-
-    console.log('Game saved successfully');
-    return true;
   } catch (error) {
-    console.error('Error saving game:', error);
-    return false;
-  }
-};
-
-/**
- * Load game state from AsyncStorage
- */
-export const loadGame = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
-    
-    if (jsonValue != null) {
-      const gameData = JSON.parse(jsonValue);
-      console.log('Game loaded successfully');
-      return gameData;
-    }
-    
-    console.log('No save data found');
-    return null;
-  } catch (error) {
-    console.error('Error loading game:', error);
-    
-    // Try to load backup if main save fails
-    try {
-      const backupValue = await AsyncStorage.getItem(BACKUP_KEY);
-      if (backupValue != null) {
-        const backupData = JSON.parse(backupValue);
-        console.log('Loaded backup save data');
-        return backupData;
-      }
-    } catch (backupError) {
-      console.error('Error loading backup:', backupError);
-    }
-    
-    return null;
-  }
-};
-
-/**
- * Clear all game data (for reset)
- */
-export const clearGameData = async () => {
-  try {
-    await AsyncStorage.removeItem(STORAGE_KEY);
-    await AsyncStorage.removeItem(BACKUP_KEY);
-    console.log('Game data cleared');
-    return true;
-  } catch (error) {
-    console.error('Error clearing game data:', error);
-    return false;
-  }
-};
-
-/**
- * Export save data as string (for sharing/backup)
- */
-export const exportSaveData = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
-    return jsonValue;
-  } catch (error) {
-    console.error('Error exporting save data:', error);
-    return null;
-  }
-};
-
-/**
- * Import save data from string
- */
-export const importSaveData = async (saveString) => {
-  try {
-    // Validate the save data first
-    const gameData = JSON.parse(saveString);
-    
-    // Basic validation - check for required fields
-    if (!gameData.currency && gameData.currency !== 0) {
-      throw new Error('Invalid save data format');
-    }
-
-    await AsyncStorage.setItem(STORAGE_KEY, saveString);
-    console.log('Save data imported successfully');
-    return gameData;
-  } catch (error) {
-    console.error('Error importing save data:', error);
-    return null;
-  }
-};
-
-/**
- * Get storage info (for debugging)
- */
-export const getStorageInfo = async () => {
-  try {
-    const keys = await AsyncStorage.getAllKeys();
-    const gameKeys = keys.filter(key => key.startsWith('@IdleGame:'));
-    
-    const info = {
-      totalKeys: keys.length,
-      gameKeys: gameKeys.length,
-      keys: gameKeys,
-    };
-
-    console.log('Storage info:', info);
-    return info;
-  } catch (error) {
-    console.error('Error getting storage info:', error);
-    return null;
+    console.error('Erreur lors de l\'exportation des données:', error);
+    throw error;
   }
 };

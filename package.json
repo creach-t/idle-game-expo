@@ -1,0 +1,52 @@
+{
+  "name": "idle-game-expo",
+  "version": "1.0.0",
+  "description": "Jeu idle addictif avec système de prestige - Architecture modulaire",
+  "main": "expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "keywords": [
+    "expo",
+    "react-native",
+    "idle-game",
+    "mobile-game",
+    "prestige-system"
+  ],
+  "author": "creach-t",
+  "license": "MIT",
+  "dependencies": {
+    "expo": "~52.0.0",
+    "react": "18.3.1",
+    "react-native": "0.76.3",
+    "@react-navigation/native": "^6.1.18",
+    "@react-navigation/stack": "^6.4.1",
+    "react-native-screens": "3.36.0",
+    "react-native-safe-area-context": "4.12.0",
+    "react-native-reanimated": "~3.16.1",
+    "@react-native-async-storage/async-storage": "1.25.0",
+    "expo-av": "~15.0.1",
+    "expo-notifications": "~0.29.9",
+    "expo-haptics": "~13.0.1",
+    "react-native-gesture-handler": "~2.20.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/creach-t/idle-game-expo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/creach-t/idle-game-expo/issues"
+  },
+  "homepage": "https://github.com/creach-t/idle-game-expo#readme",
+  "private": true
+}

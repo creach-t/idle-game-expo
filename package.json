@@ -1,52 +1,23 @@
 {
   "name": "idle-game-expo",
   "version": "1.0.0",
-  "description": "Jeu idle addictif avec système de prestige - Architecture modulaire",
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "install-expo": "npm install -g @expo/cli",
-    "lint": "eslint .",
-    "test": "jest"
+    "web": "expo start --web"
   },
-  "keywords": [
-    "expo",
-    "react-native",
-    "idle-game",
-    "mobile-game",
-    "prestige-system"
-  ],
-  "author": "creach-t",
-  "license": "MIT",
   "dependencies": {
-    "expo": "~53.0.0",
-    "expo-status-bar": "~2.0.0",
+    "expo": "~51.0.0",
+    "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
-    "react-native": "0.76.3",
-    "@react-navigation/native": "^6.1.7",
-    "@react-navigation/stack": "^6.3.17",
-    "react-native-screens": "~3.36.0",
-    "react-native-safe-area-context": "4.12.0",
-    "react-native-reanimated": "~3.16.1",
-    "@react-native-async-storage/async-storage": "1.24.0",
-    "expo-av": "~15.0.1",
-    "expo-notifications": "~0.29.9",
-    "expo-haptics": "~13.0.1",
-    "react-native-gesture-handler": "~2.20.2"
+    "react-native": "0.74.5",
+    "react-native-reanimated": "~3.10.1",
+    "@react-native-async-storage/async-storage": "1.23.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/creach-t/idle-game-expo.git"
-  },
-  "bugs": {
-    "url": "https://github.com/creach-t/idle-game-expo/issues"
-  },
-  "homepage": "https://github.com/creach-t/idle-game-expo#readme",
   "private": true
 }

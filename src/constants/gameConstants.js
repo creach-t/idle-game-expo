@@ -1,18 +1,43 @@
-// 🎨 Design System Constants
+/**
+ * 🎨 gameConstants - Constantes de design et configuration du jeu
+ * Valeurs centralisées pour maintenir la cohérence visuelle
+ */
+
+// Palette de couleurs
 export const COLORS = {
-  primary: '#ff6b35',
-  secondary: '#004e92', 
-  background: '#1a1a1a',
-  surface: '#2d2d2d',
-  accent: '#ffd23f',
-  text: '#ffffff',
-  textSecondary: '#b0b0b0',
-  success: '#4caf50',
-  warning: '#ff9800',
-  error: '#f44336',
+  // Couleurs principales
+  primary: '#ff6b35',        // Orange énergique
+  secondary: '#004e92',      // Bleu profond
+  accent: '#ffd23f',         // Jaune doré
+  
+  // Couleurs d'état
+  success: '#4caf50',        // Vert succès
+  warning: '#ff9800',        // Orange attention
+  error: '#f44336',          // Rouge erreur
+  info: '#2196f3',           // Bleu information
+  
+  // Couleurs de background
+  background: '#1a1a1a',     // Noir moderne
+  surface: '#2d2d2d',        // Gris foncé
+  card: '#3d3d3d',           // Gris carte
+  
+  // Couleurs de texte
+  text: '#ffffff',           // Blanc principal
+  textSecondary: '#b0b0b0',  // Gris secondaire
+  textMuted: '#888888',      // Gris discret
+  
+  // Couleurs d'interface
+  border: '#444444',         // Bordures
+  divider: '#333333',        // Séparateurs
+  shadow: '#000000',         // Ombres
+  
+  // Couleurs de jeu spécifiques
+  currencyGold: '#ffd700',   // Or pour la monnaie
+  prestigeStar: '#e6e6fa',   // Lavande pour prestige
+  upgradeGlow: '#00ff88',    // Vert néon pour upgrades
 };
 
-// 📏 Spacing & Layout
+// Espacements
 export const SPACING = {
   xs: 4,
   sm: 8,
@@ -22,90 +47,67 @@ export const SPACING = {
   xxl: 48,
 };
 
-export const BORDER_RADIUS = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
+// Tailles de police
+export const FONT_SIZES = {
+  tiny: 10,
+  small: 12,
+  medium: 14,
+  large: 16,
+  xlarge: 18,
+  xxlarge: 20,
+  huge: 24,
+  massive: 32,
 };
 
-// 🎮 Game Balance Constants
-export const GAME_CONFIG = {
-  CLICK_BASE_POWER: 1,
-  GENERATOR_COST_MULTIPLIER: 1.15,
-  PRESTIGE_REQUIREMENT: 1000000,
-  PRESTIGE_MULTIPLIER_BASE: 0.1,
-  OFFLINE_EFFICIENCY: 0.5,
-  SAVE_INTERVAL: 5000, // 5 seconds
-  GAME_TICK_RATE: 100, // 10 FPS
+// Configuration des générateurs par défaut
+export const GENERATOR_CONFIG = {
+  basePrice: 10,
+  priceMultiplier: 1.15,
+  baseIncome: 1,
+  incomeMultiplier: 1.07,
+  unlockThreshold: 0,
 };
 
-// 🏭 Generator Data
-export const GENERATORS = [
-  {
-    id: 1,
-    name: 'Miner',
-    description: 'Basic resource extractor',
-    baseCost: 10,
-    baseIncome: 1,
-    icon: '⛏️',
-  },
-  {
-    id: 2,
-    name: 'Factory',
-    description: 'Automated production line',
-    baseCost: 100,
-    baseIncome: 10,
-    icon: '🏭',
-  },
-  {
-    id: 3,
-    name: 'Laboratory',
-    description: 'Advanced research facility',
-    baseCost: 1000,
-    baseIncome: 100,
-    icon: '🔬',
-  },
-  {
-    id: 4,
-    name: 'Quantum Core',
-    description: 'Quantum-powered generator',
-    baseCost: 10000,
-    baseIncome: 1000,
-    icon: '⚛️',
-  },
-  {
-    id: 5,
-    name: 'AI Network',
-    description: 'Self-improving AI system',
-    baseCost: 100000,
-    baseIncome: 10000,
-    icon: '🤖',
-  },
+// Configuration du prestige
+export const PRESTIGE_CONFIG = {
+  threshold: 1000000,        // Seuil minimum pour prestige
+  baseMultiplier: 1.5,       // Multiplicateur de base
+  scalingFactor: 0.1,        // Facteur d'évolution
+  maxMultiplier: 10.0,       // Multiplicateur maximum
+};
+
+// Durées d'animation
+export const ANIMATION_DURATION = {
+  fast: 150,
+  normal: 300,
+  slow: 500,
+  verySlow: 1000,
+};
+
+// Seuils de formatage des nombres
+export const NUMBER_FORMAT = {
+  thousand: 1000,
+  million: 1000000,
+  billion: 1000000000,
+  trillion: 1000000000000,
+  maxDecimals: 2,
+};
+
+// Configuration de sauvegarde
+export const SAVE_CONFIG = {
+  autoSaveInterval: 10000,   // 10 secondes
+  maxBackups: 5,
+  compressionLevel: 6,
+};
+
+// Types d'icônes disponibles
+export const ICON_TYPES = [
+  'currency',
+  'click',
+  'factory',
+  'upgrade',
+  'generator',
+  'income',
+  'prestige',
+  'settings',
 ];
-
-// 🎯 Achievements Configuration
-export const ACHIEVEMENTS = [
-  {
-    id: 1,
-    name: 'First Click',
-    description: 'Click your first coin',
-    requirement: { type: 'clicks', value: 1 },
-    reward: { type: 'multiplier', value: 1.1 },
-  },
-  {
-    id: 2,
-    name: 'Millionaire',
-    description: 'Earn 1 million coins',
-    requirement: { type: 'totalEarned', value: 1000000 },
-    reward: { type: 'prestigePoints', value: 1 },
-  },
-];
-
-// 📱 Screen Dimensions
-export const SCREEN = {
-  CLICK_BUTTON_SIZE: 120,
-  GENERATOR_HEIGHT: 80,
-  HEADER_HEIGHT: 60,
-  BOTTOM_TAB_HEIGHT: 80,
-};
